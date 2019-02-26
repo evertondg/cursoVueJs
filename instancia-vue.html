@@ -11,14 +11,19 @@
 <body>
 
     <div id="app">
-            <input type="text" v-model="variavel">
-            {{ variavel }}
+            <input type="text" v-model="variavel">  <br/>
+            <input type="text" v-model="variavel2"> <br/>
+
+           Resultado da adição: {{parseInt(variavel) + parseInt(variavel2)}}
+
+            
       </div>   
 <script>
         var app = new Vue({
         el: '#app',
         data: {
-            variavel: ''
+            variavel: 0,
+            variavel2: 0
         }
         })    
 </script>       
