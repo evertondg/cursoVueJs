@@ -22,8 +22,32 @@
 
             <button class="btn btn-primary" @click="showAlert()"> Fim de jogo </button>
 
+            <div>
+                
+                
+            </div>
 
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Pontos</th>
+                        <th>GM</th>
+                        <th>GS</th>
+                        <th>Saldo</th>
+                    </tr>
+                </thead>
+                <tbody> 
+                    <tr v-for="time in times">
+                        <td><img :src="time.escudo" :alt="time.nome"><br/>{{time.nome}}</td>
+                        <td>{{time.pontos}}</td>
+                        <td>{{time.gm}}</td>
+                        <td>{{time.gs}}</td>
+                        <td></td>
+                    </tr>
+                </tbody>
 
+            </table>
             
       </div> 
       
@@ -31,10 +55,46 @@
 
 
 <script>
+        class Time {    // ES6
+
+            constructor(nome, escudo){
+                this.nome = nome;
+                this.escudo = escudo;
+
+                this.pontos = 0;
+                this.gm = 0;
+                this.gs = 0;
+            }
+
+        }
+
+
         var app = new Vue({
         el: '#app',
         data: {
-            gols: 3
+            gols: 3,
+            times: [
+                        new Time('America MG','assets/america_mg_60x60.png'),
+                        new Time('Atletico PR','assets/atletico-pr_60x60.png'),
+                        new Time('Bahia','assets/bahia_60x60.png'),
+                        new Time('Botafogo','assets/botafogo_60x60.png'),
+                        new Time('Ceara','assets/ceara_60x60.png'),
+                        new Time('Chapecoense','assets/chapecoense_60x60.png'),
+                        new Time('Corinthians','assets/corinthians_60x60.png'),
+                        new Time('Cruzeiro','assets/cruzeiro_60x60.png'),
+                        new Time('Flamento','assets/flamengo_60x60.png'),
+                        new Time('Fluminense','assets/fluminense_60x60.png'),
+                        new Time('Gremio','assets/gremio_60x60.png'),
+                        new Time('Internacional','assets/internacional_60x60.png'),
+                        new Time('Palmeiras','assets/palmeiras_60x60.png'),
+                        new Time('Parana','assets/parana_60x60.png'),
+                        new Time('Santos','assets/santos_60x60.png'),
+                        new Time('Sao Paulo','assets/sao_paulo_60x60.png'),
+                        new Time('Sport','assets/sport_60x60.png'),
+                        new Time('Vasco','assets/vasco_60x60.png'),
+                        new Time('Vitoria','assets/vitoria_60x60.png')
+                        
+            ]
         },
         methods: {
             showAlert(){
