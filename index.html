@@ -18,9 +18,9 @@
                 <h3>Campeonato Brasileiro série A - 2019</h3>
             </div>
             
-            <input type="text" :value="gols"> {{gols}}
+            <input type="text" v-model="gols"  @input="pegarValor($event.target.value)"> {{gols}}
 
-            <button class="btn btn-primary" @click="showAlert"> Fim de jogo </button>
+            <button class="btn btn-primary" @click="showAlert()"> Fim de jogo </button>
 
 
 
@@ -39,6 +39,9 @@
         methods: {
             showAlert(){
                 alert('Fim de jogo')
+            },
+            pegarValor($event){
+                console.log($event)
             }
         },
         })    
