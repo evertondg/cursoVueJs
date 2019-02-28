@@ -1,31 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>School of Net - Campeonato Brasileiro 2019 </title>
-    <!-- development version, includes helpful console warnings -->
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
+    <head>
+        <meta charset="UTF-8">
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>School of Net - Campeonato Brasileiro 2019
+        </title>
+        <!-- development version, includes helpful console warnings -->
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link
+            rel="stylesheet"
+            href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+            integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+            crossorigin="anonymous">
+        <style type="text/css">
+            .escudo {
+                width: 30px;
+                height: 30px;
+            }
+        </style>
 
-</head>
-<body>
+    </head>
+    <body>
 
-    <div id="app" class="container">
+        <div id="app" class="container">
             <div class="row">
                 <h3>Campeonato Brasileiro série A - 2019</h3>
             </div>
-            
-            <input type="text" v-model="gols"  @input="pegarValor($event.target.value)"> {{gols}}
 
-            <button class="btn btn-primary" @click="showAlert()"> Fim de jogo </button>
+            <div class="row">
+                <div class="col-md-12">
+                    <button class="btn btn-primary" @click="criarNovoJogo">
+                        NovoJogo
+                    </button>
+                </div>
 
-            <div>
-                
-                
             </div>
+
+            <form class="form-inline">
+
+                <input type="text" class="form-control" v-model="novoJogo.casa.gols">
+                <span>
+                    {{novoJogo.casa.time ? novoJogo.casa.time.nome : ''}}
+                    <img
+                        :src="novoJogo.casa.time ? novoJogo.casa.time.escudo : ''"
+                        :alt="novoJogo.casa.time ? novoJogo.casa.time.nome : ''"
+                        class="escudo">
+                    <br/>
+
+                </span>
+                <span>
+                    X
+                </span>
+
+                <span>
+                    <img
+                        :src="novoJogo.fora.time ? novoJogo.fora.time.escudo : ''"
+                        :alt="novoJogo.fora.time ? novoJogo.fora.time.nome : ''"
+                        class="escudo">
+                    {{novoJogo.fora.time ? novoJogo.fora.time.nome : ''}}
+                </span>
+                <input type="text" class="form-control" v-model="novoJogo.fora.gols">
+
+            </form>
+
+            <button class="btn btn-primary" @click="fimJogo()">
+                Fim de jogo
+            </button>
 
             <table class="table table-striped">
                 <thead>
@@ -37,9 +81,9 @@
                         <th>Saldo</th>
                     </tr>
                 </thead>
-                <tbody> 
+                <tbody>
                     <tr v-for="time in times">
-                        <td><img :src="time.escudo" :alt="time.nome"><br/>{{time.nome}}</td>
+                        <td><img :src="time.escudo" :alt="time.nome" class="escudo">{{time.nome}}</td>
                         <td>{{time.pontos}}</td>
                         <td>{{time.gm}}</td>
                         <td>{{time.gs}}</td>
@@ -48,67 +92,146 @@
                 </tbody>
 
             </table>
-            
-      </div> 
-      
-      
 
+        </div>
 
-<script>
-        class Time {    // ES6
+        <script>
+            class Time { // ES6
 
-            constructor(nome, escudo){
-                this.nome = nome;
-                this.escudo = escudo;
+                constructor(nome, escudo) {
+                    this.nome = nome;
+                    this.escudo = escudo;
 
-                this.pontos = 0;
-                this.gm = 0;
-                this.gs = 0;
+                    this.pontos = 0;
+                    this.gm = 0;
+                    this.gs = 0;
+                }
+
+                fimJogo(timeVisitante, golsMarcados, golsSofridos) {
+                    if (this.foiEmpate(golsMarcados, golsSofridos)) {
+                        this.empate(golsMarcados, golsSofridos);
+                        timeVisitante.empate(golsSofridos, golsMarcados);
+                    }
+
+                    if (this.foiVitoria(golsMarcados, golsSofridos)) {
+                        this.vitoria(golsMarcados, golsSofridos);
+                        timeVisitante.derrota(golsSofridos, golsMarcados);
+
+                    } else {
+                        this.derrota(golsMarcados, golsSofridos);
+                        timeVisitante.vitoria(golsSofridos, golsMarcados);
+
+                    }
+
+                }
+
+                foiEmpate(golsMarcados, golsSofridos) {
+                    return golsMarcados === golsSofridos;
+                }
+
+                foiVitoria(golsMarcados, golsSofridos) {
+                    return golsMarcados > golsSofridos;
+                }
+
+                empate(golsMarcados, golsSofridos) {
+                    this.atualizarInfo(1, golsMarcados, golsSofridos);
+                }
+
+                vitoria(golsMarcados, golsSofridos) {
+                    this.atualizarInfo(3, golsMarcados, golsSofridos);
+                }
+
+                derrota(golsMarcados, golsSofridos) {
+                    this.atualizarInfo(0, golsMarcados, golsSofridos);
+                }
+
+                atualizarInfo(pontos, golsMarcados, golsSofridos) {
+                    this.pontos += pontos;
+                    this.gm += golsMarcados;
+                    this.gs += golsSofridos;
+                }
+
             }
 
-        }
+            var app = new Vue({
+                el: '#app',
+                data: {
+                    gols: 3,
+                    times: [
+                        new Time('America MG', 'assets/america_mg_60x60.png'),
+                        new Time('Atletico PR', 'assets/atletico-pr_60x60.png'),
+                        new Time('Bahia', 'assets/bahia_60x60.png'),
+                        new Time('Botafogo', 'assets/botafogo_60x60.png'),
+                        new Time('Ceara', 'assets/ceara_60x60.png'),
+                        new Time('Chapecoense', 'assets/chapecoense_60x60.png'),
+                        new Time('Corinthians', 'assets/corinthians_60x60.png'),
+                        new Time('Cruzeiro', 'assets/cruzeiro_60x60.png'),
+                        new Time('Flamengo', 'assets/flamengo_60x60.png'),
+                        new Time('Fluminense', 'assets/fluminense_60x60.png'),
+                        new Time('Gremio', 'assets/gremio_60x60.png'),
+                        new Time('Internacional', 'assets/internacional_60x60.png'),
+                        new Time('Palmeiras', 'assets/palmeiras_60x60.png'),
+                        new Time('Parana', 'assets/parana_60x60.png'),
+                        new Time('Santos', 'assets/santos_60x60.png'),
+                        new Time('Sao Paulo', 'assets/sao_paulo_60x60.png'),
+                        new Time('Sport', 'assets/sport_60x60.png'),
+                        new Time('Vasco', 'assets/vasco_60x60.png'),
+                        new Time('Vitoria', 'assets/vitoria_60x60.png')
 
+                    ],
+                    novoJogo: {
+                        casa: {
+                            time: null,
+                            gols: 0
+                        },
+                        fora: {
+                            time: null,
+                            gols: 0
+                        }
+                    }
+                },
+                methods: {
+                    showAlert() {
+                        alert('Fim de jogo')
+                    },
+                    pegarValor($event) {
+                        console.log($event)
+                    },
+                    criarNovoJogo() {
+                        var indiceCasa = Math.floor(Math.random() * 19),
+                            indiceFora = Math.floor(Math.random() * 19)
 
-        var app = new Vue({
-        el: '#app',
-        data: {
-            gols: 3,
-            times: [
-                        new Time('America MG','assets/america_mg_60x60.png'),
-                        new Time('Atletico PR','assets/atletico-pr_60x60.png'),
-                        new Time('Bahia','assets/bahia_60x60.png'),
-                        new Time('Botafogo','assets/botafogo_60x60.png'),
-                        new Time('Ceara','assets/ceara_60x60.png'),
-                        new Time('Chapecoense','assets/chapecoense_60x60.png'),
-                        new Time('Corinthians','assets/corinthians_60x60.png'),
-                        new Time('Cruzeiro','assets/cruzeiro_60x60.png'),
-                        new Time('Flamento','assets/flamengo_60x60.png'),
-                        new Time('Fluminense','assets/fluminense_60x60.png'),
-                        new Time('Gremio','assets/gremio_60x60.png'),
-                        new Time('Internacional','assets/internacional_60x60.png'),
-                        new Time('Palmeiras','assets/palmeiras_60x60.png'),
-                        new Time('Parana','assets/parana_60x60.png'),
-                        new Time('Santos','assets/santos_60x60.png'),
-                        new Time('Sao Paulo','assets/sao_paulo_60x60.png'),
-                        new Time('Sport','assets/sport_60x60.png'),
-                        new Time('Vasco','assets/vasco_60x60.png'),
-                        new Time('Vitoria','assets/vitoria_60x60.png')
+                        this.novoJogo.casa.time = this.times[indiceCasa];
+                        this.novoJogo.casa.gols = 0;
+
+                        this.novoJogo.fora.time = this.times[indiceFora];
+                        this.novoJogo.fora.gols = 0;
+
+                        console.log(this.novoJogo);
+                    },
+                    fimJogo(){
+                        var golsMarcados = parseInt(this.novoJogo.casa.gols) ;
+                        var golsSofridos = parseInt(this.novoJogo.fora.gols) ;
+                        var timeAdversario = this.novoJogo.fora.time;
+                        var timeCasa = this.novoJogo.casa.time;
+                        timeCasa.fimJogo(timeAdversario,golsMarcados,golsSofridos);
                         
-            ]
-        },
-        methods: {
-            showAlert(){
-                alert('Fim de jogo')
-            },
-            pegarValor($event){
-                console.log($event)
-            }
-        },
-        })    
-</script>  
+                    }
+                }
+            })
+        </script>
 
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-</body>
+        <script
+            src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+            crossorigin="anonymous"></script>
+        <script
+            src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+            crossorigin="anonymous"></script>
+    </body>
 </html>
