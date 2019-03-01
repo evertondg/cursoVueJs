@@ -28,70 +28,79 @@
 
         <div id="app" class="container">
             <div class="row">
-                <h3>Campeonato Brasileiro série A - 2019</h3>
+                <h3>Campeonato Brasileiro série A - 2019 - {{visao}}</h3>
             </div>
 
             <div class="row">
                 <div class="col-md-12">
-                    <button class="btn btn-primary" @click="criarNovoJogo">
+                    <button type="button" class="btn btn-primary" @click="criarNovoJogo()">
                         NovoJogo
+                    </button>
+
+                    <button type="button" class="btn btn-primary" @click="fimJogo()">
+                        Fim de jogo
                     </button>
                 </div>
 
             </div>
+            <br/>
+            <div class="row">
+                <div class="col-md-12" v-if="visao!='tabela'">
 
-            <form class="form-inline">
+                    <form class="form-inline">
 
-                <input type="text" class="form-control" v-model="novoJogo.casa.gols">
-                <span>
-                    {{novoJogo.casa.time ? novoJogo.casa.time.nome : ''}}
-                    <img
-                        :src="novoJogo.casa.time ? novoJogo.casa.time.escudo : ''"
-                        :alt="novoJogo.casa.time ? novoJogo.casa.time.nome : ''"
-                        class="escudo">
-                    <br/>
+                        <input type="text" class="form-control" v-model="novoJogo.casa.gols">
+                        <span>
+                            {{novoJogo.casa.time ? novoJogo.casa.time.nome : ''}}
+                            <img
+                                :src="novoJogo.casa.time ? novoJogo.casa.time.escudo : ''"
+                                :alt="novoJogo.casa.time ? novoJogo.casa.time.nome : ''"
+                                class="escudo">
+                            <br/>
 
-                </span>
-                <span>
-                    X
-                </span>
+                        </span>
+                        <span>
+                            X
+                        </span>
 
-                <span>
-                    <img
-                        :src="novoJogo.fora.time ? novoJogo.fora.time.escudo : ''"
-                        :alt="novoJogo.fora.time ? novoJogo.fora.time.nome : ''"
-                        class="escudo">
-                    {{novoJogo.fora.time ? novoJogo.fora.time.nome : ''}}
-                </span>
-                <input type="text" class="form-control" v-model="novoJogo.fora.gols">
+                        <span>
+                            <img
+                                :src="novoJogo.fora.time ? novoJogo.fora.time.escudo : ''"
+                                :alt="novoJogo.fora.time ? novoJogo.fora.time.nome : ''"
+                                class="escudo">
+                            {{novoJogo.fora.time ? novoJogo.fora.time.nome : ''}}
+                        </span>
+                        <input type="text" class="form-control" v-model="novoJogo.fora.gols">
 
-            </form>
+                    </form>
 
-            <button class="btn btn-primary" @click="fimJogo()">
-                Fim de jogo
-            </button>
+                </div>
+                <div class="col-md-12" v-if="visao='tabela'">
 
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Nome</th>
-                        <th>Pontos</th>
-                        <th>GM</th>
-                        <th>GS</th>
-                        <th>Saldo</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="time in times">
-                        <td><img :src="time.escudo" :alt="time.nome" class="escudo">{{time.nome}}</td>
-                        <td>{{time.pontos}}</td>
-                        <td>{{time.gm}}</td>
-                        <td>{{time.gs}}</td>
-                        <td></td>
-                    </tr>
-                </tbody>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Pontos</th>
+                                <th>GM</th>
+                                <th>GS</th>
+                                <th>Saldo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="time in times">
+                                <td><img :src="time.escudo" :alt="time.nome" class="escudo">{{time.nome}}</td>
+                                <td>{{time.pontos}}</td>
+                                <td>{{time.gm}}</td>
+                                <td>{{time.gs}}</td>
+                                <td></td>
+                            </tr>
+                        </tbody>
 
-            </table>
+                    </table>
+
+                </div>
+            </div>
 
         </div>
 
@@ -188,7 +197,8 @@
                             time: null,
                             gols: 0
                         }
-                    }
+                    },
+                    visao: 'tabela',
                 },
                 methods: {
                     showAlert() {
@@ -206,16 +216,17 @@
 
                         this.novoJogo.fora.time = this.times[indiceFora];
                         this.novoJogo.fora.gols = 0;
-
                         console.log(this.novoJogo);
+                        this.visao = 'placar';
                     },
-                    fimJogo(){
-                        var golsMarcados = parseInt(this.novoJogo.casa.gols) ;
-                        var golsSofridos = parseInt(this.novoJogo.fora.gols) ;
+                    fimJogo() {
+                        var golsMarcados = parseInt(this.novoJogo.casa.gols);
+                        var golsSofridos = parseInt(this.novoJogo.fora.gols);
                         var timeAdversario = this.novoJogo.fora.time;
                         var timeCasa = this.novoJogo.casa.time;
-                        timeCasa.fimJogo(timeAdversario,golsMarcados,golsSofridos);
-                        
+                        timeCasa.fimJogo(timeAdversario, golsMarcados, golsSofridos);
+                        this.visao = 'tabela';
+
                     }
                 }
             })
