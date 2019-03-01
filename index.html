@@ -10,7 +10,7 @@
         </title>
         <!-- development version, includes helpful console warnings -->
         <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
-
+        <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.11/lodash.min.js"></script>
         <link
             rel="stylesheet"
             href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
@@ -28,7 +28,7 @@
 
         <div id="app" class="container">
             <div class="row">
-                <h3>Campeonato Brasileiro série A - 2019 - {{visao}}</h3>
+                <h1>Campeonato Brasileiro série A - 2019 - {{visao}}</h1>
             </div>
 
             <div class="row">
@@ -75,30 +75,47 @@
                     </form>
 
                 </div>
-                <div class="col-md-12" v-if="visao='tabela'">
+                <div class="col-md-12" v-if="visao=='tabela'">
 
                     <table class="table table-striped">
                         <thead>
                             <tr>
                                 <th>Nome</th>
-                                <th>Pontos</th>
-                                <th>GM</th>
-                                <th>GS</th>
-                                <th>Saldo</th>
+                                <th v-for="(coluna,indice) in ordem.colunas">
+                                   <a href="#" @click.prevent="ordem.orientacao[indice] = ordem.orientacao[indice]=='desc'?'asc':'desc'"> 
+                                       {{coluna | ucwords}}
+                                    </a>
+                                </th>
+                                
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="time in times">
-                                <td><img :src="time.escudo" :alt="time.nome" class="escudo">{{time.nome}}</td>
+                            <tr v-for="time in timesOrdenados">
+                                <td><img :src="time.escudo" :alt="time.nome" class="escudo">{{time.nome | ucwords}}</td>
                                 <td>{{time.pontos}}</td>
                                 <td>{{time.gm}}</td>
                                 <td>{{time.gs}}</td>
-                                <td></td>
+                                <!-- <td>{{time | saldo}}</td> -->
+                                <td>{{time.saldo}}</td>
                             </tr>
                         </tbody>
 
                     </table>
 
+                    <h3>Times Classificados Libertadores</h3>
+                    <ul>
+                        <li v-for="time in timesLibertadores">
+                            <img :src="time.escudo" :alt="time.nome" class="escudo">{{time.nome | ucwords}}
+                        </li>
+                    </ul>
+
+
+                    <h3>Times Rebaixados </h3>
+                    <ul>
+                        <li v-for="time in timesRebaixados">
+                            <img :src="time.escudo" :alt="time.nome" class="escudo">{{time.nome | ucwords}}
+                        </li>
+                    </ul>                    
                 </div>
             </div>
 
@@ -114,12 +131,14 @@
                     this.pontos = 0;
                     this.gm = 0;
                     this.gs = 0;
+                    this.saldo =0;
                 }
 
                 fimJogo(timeVisitante, golsMarcados, golsSofridos) {
                     if (this.foiEmpate(golsMarcados, golsSofridos)) {
                         this.empate(golsMarcados, golsSofridos);
                         timeVisitante.empate(golsSofridos, golsMarcados);
+                        return;
                     }
 
                     if (this.foiVitoria(golsMarcados, golsSofridos)) {
@@ -158,6 +177,7 @@
                     this.pontos += pontos;
                     this.gm += golsMarcados;
                     this.gs += golsSofridos;
+                    this.saldo = this.gm - this.gs ;
                 }
 
             }
@@ -166,10 +186,14 @@
                 el: '#app',
                 data: {
                     gols: 3,
+                    ordem:{
+                        colunas:['pontos','gm','gs','saldo'],
+                        orientacao:['desc','desc','asc','desc']
+                    },
                     times: [
-                        new Time('America MG', 'assets/america_mg_60x60.png'),
+                        new Time('america MG', 'assets/america_mg_60x60.png'),
                         new Time('Atletico PR', 'assets/atletico-pr_60x60.png'),
-                        new Time('Bahia', 'assets/bahia_60x60.png'),
+                        new Time('bahia', 'assets/bahia_60x60.png'),
                         new Time('Botafogo', 'assets/botafogo_60x60.png'),
                         new Time('Ceara', 'assets/ceara_60x60.png'),
                         new Time('Chapecoense', 'assets/chapecoense_60x60.png'),
@@ -179,7 +203,7 @@
                         new Time('Fluminense', 'assets/fluminense_60x60.png'),
                         new Time('Gremio', 'assets/gremio_60x60.png'),
                         new Time('Internacional', 'assets/internacional_60x60.png'),
-                        new Time('Palmeiras', 'assets/palmeiras_60x60.png'),
+                        new Time('palmeiras', 'assets/palmeiras_60x60.png'),
                         new Time('Parana', 'assets/parana_60x60.png'),
                         new Time('Santos', 'assets/santos_60x60.png'),
                         new Time('Sao Paulo', 'assets/sao_paulo_60x60.png'),
@@ -199,6 +223,19 @@
                         }
                     },
                     visao: 'tabela',
+                },
+                computed:{
+                    timesOrdenados(){
+                        console.log('ordem',this.ordem);
+                        return  _.orderBy(this.times,this.ordem.colunas,this.ordem.orientacao);
+
+                    } ,
+                    timesLibertadores(){
+                        return this.times.slice(0,6);
+                    },
+                    timesRebaixados(){
+                        return this.times.slice(15,20);
+                    }                  
                 },
                 methods: {
                     showAlert() {
@@ -227,6 +264,14 @@
                         timeCasa.fimJogo(timeAdversario, golsMarcados, golsSofridos);
                         this.visao = 'tabela';
 
+                    }
+                },
+                filters: {
+                    saldo(time){
+                        return time.gm - time.gs;
+                    },
+                    ucwords(valor){
+                        return valor.charAt(0).toUpperCase() + valor.slice(1);
                     }
                 }
             })
