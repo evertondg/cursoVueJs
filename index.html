@@ -74,22 +74,27 @@
 
                 </div>
                 <div class="col-md-12" v-if="visao=='tabela'">
-                    Busca: <input type="text" class="form-control" v-model="busca">
+                    Busca:
+                    <input type="text" class="form-control" v-model="busca">
                     <table class="table table-striped">
                         <thead>
                             <tr>
                                 <th>Nome</th>
                                 <th v-for="(coluna,indice) in ordem.colunas">
-                                   <a href="#" @click.prevent="ordenar(indice)"> 
-                                       {{coluna | ucwords}}
+                                    <a href="#" @click.prevent="ordenar(indice)">
+                                        {{coluna | ucwords}}
                                     </a>
                                 </th>
-                                
+
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="time in timesFiltrados">
-                                <td><img :src="time.escudo" :alt="time.nome" class="escudo">{{time.nome | ucwords}}</td>
+                            <tr  v-for="(time,indice) in timesFiltrados" :class="{'table-success' : indice < 6}" :style="{'font-size': indice<6 ? '20px':'15px'}">
+                                <td>
+                                    <!-- <img :src="time.escudo" :alt="time.nome" class="escudo">{{time.nome |
+                                    ucwords}} -->
+                                    <clube :time="time"></clube>
+                                </td>
                                 <td>{{time.pontos}}</td>
                                 <td>{{time.gm}}</td>
                                 <td>{{time.gs}}</td>
@@ -103,17 +108,17 @@
                     <h3>Times Classificados Libertadores</h3>
                     <ul>
                         <li v-for="time in timesLibertadores">
-                            <img :src="time.escudo" :alt="time.nome" class="escudo">{{time.nome | ucwords}}
+                            <clube :time="time"></clube>
                         </li>
                     </ul>
 
-
-                    <h3>Times Rebaixados </h3>
+                    <h3>Times Rebaixados
+                    </h3>
                     <ul>
                         <li v-for="time in timesRebaixados">
-                            <img :src="time.escudo" :alt="time.nome" class="escudo">{{time.nome | ucwords}}
+                            <clube :time="time"></clube>
                         </li>
-                    </ul>                    
+                    </ul>
                 </div>
             </div>
 

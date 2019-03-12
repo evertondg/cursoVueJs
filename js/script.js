@@ -1,3 +1,8 @@
+// Filtros Globaix
+Vue.filter('ucwords',  function(valor) {
+    return valor.charAt(0).toUpperCase() + valor.slice(1);
+});
+
 // Componente Título : Exibe o título da página
 Vue.component('titulo',{
     template: `
@@ -5,6 +10,21 @@ Vue.component('titulo',{
                 <h1>Campeonato Brasileiro série A - 2019</h1>
             </div>    
     `
+});
+
+Vue.component('clube',{
+    props:['time'],
+    template:`
+        <div>
+            
+           <img :src="time.escudo" :alt="time.nome" class="escudo"> {{time.nome | ucwords}}
+        </div>    
+    `,
+    methods:{
+        metodo(){
+            return this.time;
+        }
+    }
 });
 
 var app = new Vue({
@@ -123,11 +143,6 @@ var app = new Vue({
     filters: {
         saldo(time) {
             return time.gm - time.gs;
-        },
-        ucwords(valor) {
-            return valor
-                .charAt(0)
-                .toUpperCase() + valor.slice(1);
         }
     }
 })
