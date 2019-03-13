@@ -48,26 +48,12 @@
                     <form class="form-inline">
 
                         <input type="text" class="form-control" v-model="novoJogo.casa.gols">
-                        <span>
-                            {{novoJogo.casa.time ? novoJogo.casa.time.nome : ''}}
-                            <img
-                                :src="novoJogo.casa.time ? novoJogo.casa.time.escudo : ''"
-                                :alt="novoJogo.casa.time ? novoJogo.casa.time.nome : ''"
-                                class="escudo">
-                            <br/>
-
-                        </span>
+                            <clube :time="novoJogo.casa.time" invertido="true" v-if="novoJogo.casa.time"></clube> 
                         <span>
                             X
                         </span>
 
-                        <span>
-                            <img
-                                :src="novoJogo.fora.time ? novoJogo.fora.time.escudo : ''"
-                                :alt="novoJogo.fora.time ? novoJogo.fora.time.nome : ''"
-                                class="escudo">
-                            {{novoJogo.fora.time ? novoJogo.fora.time.nome : ''}}
-                        </span>
+                        <clube :time="novoJogo.fora.time" invertido="true" v-if="novoJogo.fora.time"></clube>
                         <input type="text" class="form-control" v-model="novoJogo.fora.gols">
 
                     </form>
@@ -93,7 +79,7 @@
                                 <td>
                                     <!-- <img :src="time.escudo" :alt="time.nome" class="escudo">{{time.nome |
                                     ucwords}} -->
-                                    <clube :time="time"></clube>
+                                    <clube :time="time" invertido="true"></clube>
                                 </td>
                                 <td>{{time.pontos}}</td>
                                 <td>{{time.gm}}</td>
