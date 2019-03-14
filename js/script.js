@@ -1,20 +1,25 @@
 // Filtros Globaix
-Vue.filter('ucwords',  function(valor) {
-    return valor.charAt(0).toUpperCase() + valor.slice(1);
+Vue.filter('ucwords', function (valor) {
+    return valor
+        .charAt(0)
+        .toUpperCase() + valor.slice(1);
 });
 
 // Componente Título : Exibe o título da página
-Vue.component('titulo',{
-    template: `
+Vue.component(
+    'titulo',
+    {template: `
             <div class="row"> <!-- root element -->
                 <h1>Campeonato Brasileiro série A - 2019</h1>
             </div>    
-    `
-});
+    `}
+);
 
-Vue.component('clube',{
-    props:['time','invertido'],
-    template:`
+Vue.component('clube', {
+    props: [
+        'time', 'invertido'
+    ],
+    template: `
         <div style="display:flex; flex-direction:row"> 
             
            <img :src="time.escudo" :alt="time.nome" class="escudo" :style="{order:  invertido == 'true'? 1 : 2}">  
@@ -22,9 +27,53 @@ Vue.component('clube',{
            <!-- {{invertido}} -->
         </div>    
     `,
-    methods:{
-        metodo(){
+    methods: {
+        metodo() {
             return this.time;
+        }
+    }
+});
+
+//kebab
+Vue.component('clubes-libertadores', {
+    props: ['times'],
+    template: `
+            <div>
+                <h3>Times Classificados Libertadores</h3>
+                <ul>
+                    <li v-for="time in timesLibertadores">
+                        <clube :time="time" invertido="true"></clube>
+                    </li>
+                </ul>
+            </div>    
+    `,
+    computed: {
+        timesLibertadores() {
+            return this
+                .times
+                .slice(0, 6);
+        }
+    }
+});
+
+Vue.component('clubes-rebaixados', {
+    props: ['times'],
+    template: `
+        <div>
+            <h3>Times Rebaixados
+            </h3>
+            <ul>
+                <li v-for="time in timesRebaixados">
+                    <clube :time="time" invertido="true"></clube>
+                </li>
+            </ul>        
+        </div>
+    `,
+    computed: {
+        timesRebaixados() {
+            return this
+                .times
+                .slice(15, 20);
         }
     }
 });

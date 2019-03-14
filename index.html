@@ -48,7 +48,7 @@
                     <form class="form-inline">
 
                         <input type="text" class="form-control" v-model="novoJogo.casa.gols">
-                            <clube :time="novoJogo.casa.time" invertido="true" v-if="novoJogo.casa.time"></clube> 
+                        <clube :time="novoJogo.casa.time" invertido="true" v-if="novoJogo.casa.time"></clube>
                         <span>
                             X
                         </span>
@@ -75,7 +75,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr  v-for="(time,indice) in timesFiltrados" :class="{'table-success' : indice < 6}" :style="{'font-size': indice<6 ? '20px':'15px'}">
+                            <tr
+                                v-for="(time,indice) in timesFiltrados"
+                                :class="{'table-success' : indice < 6}"
+                                :style="{'font-size': indice<6 ? '20px':'15px'}">
                                 <td>
                                     <!-- <img :src="time.escudo" :alt="time.nome" class="escudo">{{time.nome |
                                     ucwords}} -->
@@ -91,20 +94,9 @@
 
                     </table>
 
-                    <h3>Times Classificados Libertadores</h3>
-                    <ul>
-                        <li v-for="time in timesLibertadores">
-                            <clube :time="time"></clube>
-                        </li>
-                    </ul>
+                    <clubes-libertadores :times="times"></clubes-libertadores>
+                    <clubes-rebaixados :times="times"></clubes-rebaixados>
 
-                    <h3>Times Rebaixados
-                    </h3>
-                    <ul>
-                        <li v-for="time in timesRebaixados">
-                            <clube :time="time"></clube>
-                        </li>
-                    </ul>
                 </div>
             </div>
 
