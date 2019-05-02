@@ -7,12 +7,13 @@ Vue.filter('ucwords', function (valor) {
 
 // Componente Título : Exibe o título da página
 Vue.component(
-    'titulo',
-    {template: `
+    'titulo', {
+        template: `
             <div class="row"> <!-- root element -->
                 <h1>Campeonato Brasileiro série A - 2019</h1>
             </div>    
-    `}
+    `
+    }
 );
 
 Vue.component('clube', {
@@ -78,17 +79,137 @@ Vue.component('clubes-rebaixados', {
     }
 });
 
+Vue.component('tabela-clubes', {
+    props: ['times'],
+    data() {
+        return {
+            busca: '',
+            ordem: {
+                colunas: [
+                    'pontos', 'gm', 'gs', 'saldo'
+                ],
+                orientacao: ['desc', 'desc', 'asc', 'desc']
+            },
+        }
+    },
+    template: `
+                <div >
+                    Busca:
+                    <input type="text" class="form-control" v-model="busca">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th v-for="(coluna,indice) in ordem.colunas">
+                                    <a href="#" @click.prevent="ordenar(indice)">
+                                        {{coluna | ucwords}}
+                                    </a>
+                                </th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                                v-for="(time,indice) in timesFiltrados"
+                                :class="{'table-success' : indice < 6}"
+                                :style="{'font-size': indice<6 ? '20px':'15px'}">
+                                <td>
+                                    <!-- <img :src="time.escudo" :alt="time.nome" class="escudo">{{time.nome |
+                                    ucwords}} -->
+                                    <clube :time="time" invertido="true"></clube>
+                                </td>
+                                <td>{{time.pontos}}</td>
+                                <td>{{time.gm}}</td>
+                                <td>{{time.gs}}</td>
+                                <!-- <td>{{time | saldo}}</td> -->
+                                <td>{{time.saldo}}</td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+                <clubes-libertadores :times="times"></clubes-libertadores>
+                <clubes-rebaixados :times="times"></clubes-rebaixados>                    
+                </div>    
+    `,
+    computed: {
+        timesFiltrados() {
+            console.log('ordem', this.ordem);
+            var times = _.orderBy(this.times, this.ordem.colunas, this.ordem.orientacao);
+            var self = this;
+
+            return _.filter(times, function (time) {
+                var busca = self
+                    .busca
+                    .toLowerCase();
+                return time
+                    .nome
+                    .toLowerCase()
+                    .indexOf(busca) >= 0;
+            });
+
+        },
+    },
+    methods: {
+        ordenar(indice) {
+            // this.ordem.orientacao[indice] =
+            // this.ordem.orientacao[indice]=='desc'?'asc':'desc' ;
+            this.$set(
+                this.ordem.orientacao,
+                indice,
+                this.ordem.orientacao[indice] == 'desc' ?
+                'asc' :
+                'desc'
+            )
+        }
+    },
+
+});
+
+Vue.component('novo-jogo', {
+    props: ['timeCasa', 'timeFora'],
+    data() {
+        return {
+            golsCasa: 0,
+            golsFora: 0
+        }
+    },
+    template: `
+
+    <form class="form-inline">
+
+        <input type="text" class="form-control" v-model="golsCasa">
+        <clube :time="timeCasa" invertido="true" v-if="timeCasa"></clube>
+        <span>
+            X
+        </span>
+
+        <clube :time="timeFora" invertido="true" v-if="timeFora"></clube>
+        <input type="text" class="form-control" v-model="golsFora">
+
+                <button type="button" class="btn btn-primary" @click="fimJogo()">
+                    Fim de jogo
+                </button>
+    </form>
+                    
+    `,
+    methods: {
+
+        fimJogo() {
+            var golsMarcados = parseInt(this.golsCasa);
+            var golsSofridos = parseInt(this.golsFora);
+            this.timeCasa.fimJogo(this.timeFora, golsMarcados, golsSofridos);
+            this.$emit('fim-jogo', {
+                golsCasa: parseInt(this.golsCasa),
+                golsFora: parseInt(this.golsFora)
+            });
+
+        }
+    }
+})
+
 var app = new Vue({
     el: '#app',
     data: {
-        gols: 3,
-        busca: '',
-        ordem: {
-            colunas: [
-                'pontos', 'gm', 'gs', 'saldo'
-            ],
-            orientacao: ['desc', 'desc', 'asc', 'desc']
-        },
         times: [
             new Time('america MG', 'assets/america_mg_60x60.png'),
             new Time('Atletico PR', 'assets/atletico-pr_60x60.png'),
@@ -111,35 +232,21 @@ var app = new Vue({
             new Time('Vitoria', 'assets/vitoria_60x60.png')
 
         ],
-        novoJogo: {
-            casa: {
-                time: null,
-                gols: 0
-            },
-            fora: {
-                time: null,
-                gols: 0
-            }
-        },
+        // novoJogo: {
+        //     casa: {
+        //         time: null,
+        //         gols: 0
+        //     },
+        //     fora: {
+        //         time: null,
+        //         gols: 0
+        //     }
+        // },
+        timeCasa: null,
+        timeFora: null,
         visao: 'tabela'
     },
     computed: {
-        timesFiltrados() {
-            console.log('ordem', this.ordem);
-            var times = _.orderBy(this.times, this.ordem.colunas, this.ordem.orientacao);
-            var self = this;
-
-            return _.filter(times, function (time) {
-                var busca = self
-                    .busca
-                    .toLowerCase();
-                return time
-                    .nome
-                    .toLowerCase()
-                    .indexOf(busca) >= 0;
-            });
-
-        },
         timesLibertadores() {
             return this
                 .times
@@ -152,43 +259,18 @@ var app = new Vue({
         }
     },
     methods: {
-        showAlert() {
-            alert('Fim de jogo')
-        },
-        pegarValor($event) {
-            console.log($event)
-        },
         criarNovoJogo() {
             var indiceCasa = Math.floor(Math.random() * 19),
                 indiceFora = Math.floor(Math.random() * 19)
 
-            this.novoJogo.casa.time = this.times[indiceCasa];
-            this.novoJogo.casa.gols = 0;
-
-            this.novoJogo.fora.time = this.times[indiceFora];
-            this.novoJogo.fora.gols = 0;
-            //console.log(this.novoJogo);
+            this.timeCasa = this.times[indiceCasa];
+            this.timeFora = this.times[indiceFora];
             this.visao = 'placar';
         },
-        fimJogo() {
-            var golsMarcados = parseInt(this.novoJogo.casa.gols);
-            var golsSofridos = parseInt(this.novoJogo.fora.gols);
-            var timeAdversario = this.novoJogo.fora.time;
-            var timeCasa = this.novoJogo.casa.time;
-            timeCasa.fimJogo(timeAdversario, golsMarcados, golsSofridos);
-            this.visao = 'tabela';
 
-        },
-        ordenar(indice) {
-            // this.ordem.orientacao[indice] =
-            // this.ordem.orientacao[indice]=='desc'?'asc':'desc' ;
-            this.$set(
-                this.ordem.orientacao,
-                indice,
-                this.ordem.orientacao[indice] == 'desc'
-                    ? 'asc'
-                    : 'desc'
-            )
+        showTabela(event) {
+            console.log(event);
+            this.visao = 'tabela';
         }
     },
     filters: {

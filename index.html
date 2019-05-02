@@ -1,122 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta
-            name="viewport"
-            content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>School of Net - Campeonato Brasileiro 2019
-        </title>
-        <!-- development version, includes helpful console warnings -->
-        <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.11/lodash.min.js"></script>
-        <link
-            rel="stylesheet"
-            href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-            integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
-            crossorigin="anonymous">
-        <style type="text/css">
-            .escudo {
-                width: 30px;
-                height: 30px;
-            }
-        </style>
 
-    </head>
-    <body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>School of Net - Campeonato Brasileiro 2019
+    </title>
+    <!-- development version, includes helpful console warnings -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.11/lodash.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <style type="text/css">
+        .escudo {
+            width: 30px;
+            height: 30px;
+        }
+    </style>
 
-        <div id="app" class="container">
-            <titulo></titulo>
+</head>
 
-            <div class="row">
-                <div class="col-md-12">
-                    <button type="button" class="btn btn-primary" @click="criarNovoJogo()">
-                        NovoJogo
-                    </button>
+<body>
 
-                    <button type="button" class="btn btn-primary" @click="fimJogo()">
-                        Fim de jogo
-                    </button>
-                </div>
+    <div id="app" class="container">
+        <titulo></titulo>
 
-            </div>
-            <br/>
-            <div class="row">
-                <div class="col-md-12" v-if="visao!='tabela'">
+        <div class="row">
+            <div class="col-md-12">
+                <button type="button" class="btn btn-primary" @click="criarNovoJogo()">
+                    NovoJogo
+                </button>
 
-                    <form class="form-inline">
-
-                        <input type="text" class="form-control" v-model="novoJogo.casa.gols">
-                        <clube :time="novoJogo.casa.time" invertido="true" v-if="novoJogo.casa.time"></clube>
-                        <span>
-                            X
-                        </span>
-
-                        <clube :time="novoJogo.fora.time" invertido="true" v-if="novoJogo.fora.time"></clube>
-                        <input type="text" class="form-control" v-model="novoJogo.fora.gols">
-
-                    </form>
-
-                </div>
-                <div class="col-md-12" v-if="visao=='tabela'">
-                    Busca:
-                    <input type="text" class="form-control" v-model="busca">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Nome</th>
-                                <th v-for="(coluna,indice) in ordem.colunas">
-                                    <a href="#" @click.prevent="ordenar(indice)">
-                                        {{coluna | ucwords}}
-                                    </a>
-                                </th>
-
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr
-                                v-for="(time,indice) in timesFiltrados"
-                                :class="{'table-success' : indice < 6}"
-                                :style="{'font-size': indice<6 ? '20px':'15px'}">
-                                <td>
-                                    <!-- <img :src="time.escudo" :alt="time.nome" class="escudo">{{time.nome |
-                                    ucwords}} -->
-                                    <clube :time="time" invertido="true"></clube>
-                                </td>
-                                <td>{{time.pontos}}</td>
-                                <td>{{time.gm}}</td>
-                                <td>{{time.gs}}</td>
-                                <!-- <td>{{time | saldo}}</td> -->
-                                <td>{{time.saldo}}</td>
-                            </tr>
-                        </tbody>
-
-                    </table>
-
-                    <clubes-libertadores :times="times"></clubes-libertadores>
-                    <clubes-rebaixados :times="times"></clubes-rebaixados>
-
-                </div>
             </div>
 
         </div>
+        <br />
+        <div class="row">
+            <div class="col-md-12" v-if="visao!='tabela'">
 
-        <!-- Arquivos Javascript -->
-        <script src="js/time.js"></script>
-        <script src="js/script.js"></script>
+                <novo-jogo :time-casa="timeCasa" :time-fora="timeFora" @fim-jogo="showTabela($event)"></novo-jogo>
 
-        <script
-            src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-            crossorigin="anonymous"></script>
-        <script
-            src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-            crossorigin="anonymous"></script>
-        <script
-            src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-            crossorigin="anonymous"></script>
-    </body>
+            </div>
+            <div class="col-md-12" v-if="visao=='tabela'">
+
+                <tabela-clubes :times="times"></tabela-clubes>
+
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Arquivos Javascript -->
+    <script src="js/time.js"></script>
+    <script src="js/script.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
+    </script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+    </script>
+</body>
+
 </html>
